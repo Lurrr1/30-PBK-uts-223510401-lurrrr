@@ -1,8 +1,4 @@
-<script>
-export default {
-  name: "Footer",
-};
-</script>
+<script setup></script>
 
 <template>
   <footer class="footer">
@@ -25,12 +21,12 @@ export default {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  padding: 2rem 9%;
-  background: #070f2b /*var(--bg-color)*/;
+  padding: 0 9%;
+  background: #90e0ef /*var(--bg-color)*/;
 }
 
 .footer-text {
-  font-size: 1.6rem;
+  font-size: 1rem;
 }
 
 .footer-iconTop {

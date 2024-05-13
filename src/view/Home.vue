@@ -1,5 +1,7 @@
 <script setup>
 import { ref, computed } from "vue";
+import Header from "../components/Header.vue";
+import Footer from "../components/Footer.vue";
 
 let id = 0;
 
@@ -12,34 +14,55 @@ const filteredTodos = computed(() => {
 });
 
 function addTodo() {
-  todos.value.push({ id: id++, text: newTodo.value, done: false });
+  todos.value.push({
+    id: id++,
+    text: newTodo.value,
+    done: false,
+    editing: false,
+  });
   newTodo.value = "";
 }
 
 function removeTodo(todo) {
   todos.value = todos.value.filter((t) => t !== todo);
 }
+
+function startEdit(todo) {
+  todo.editing = true; // Toggle editing mode on click
+  todo.editedText = todo.text; // Backup original text for editing
+}
+
+function saveEdit(todo) {
+  if (todo.editedText.trim()) {
+    // Only save if there's actual content
+    todo.text = todo.editedText;
+  }
+  todo.editing = false; // Exit editing mode
+}
+
+function cancelEdit(todo) {
+  todo.editing = false; // Exit editing mode without saving
+  todo.editedText = todo.text; // Restore original text
+}
 </script>
 
 <template>
+  <Header />
   <main class="app">
-    <section class="greeting">
-      <!-- <hr />
-      <hr /> -->
-    </section>
     <section class="create-todo">
-      <h3><b>Isi List Tugas Yang Akan Dilakukan!</b></h3>
+      <h3><b>Isi List tugas yang akan dilakukan!</b></h3>
       <form id="new-todo-form" @submit.prevent="addTodo">
         <input
           type="text"
           name="content"
           id="content"
-          placeholder="Cth : Tugas Pemrograman Berbasis Komponen Pertemuan 1"
+          placeholder="Example: PBK"
           v-model="newTodo"
         />
-        <button class="tugas">Tambahkan Tugas</button>
+        <button class="tugas">Tambahkan tugas</button>
       </form>
     </section>
+
     <section class="todo-list">
       <h3><b>LIST TUGAS :</b></h3>
       <div
@@ -53,16 +76,29 @@ function removeTodo(todo) {
               type="checkbox"
               class="styled-checkbox"
               v-model="todo.done"
+              :disabled="todo.editing"
             />
-            <span :class="{ done: todo.done }">{{ todo.text }}</span>
+            <span :class="{ done: todo.done }" v-if="!todo.editing">
+              {{ todo.text }}
+            </span>
+            <input
+              type="text"
+              v-model="todo.editedText"
+              v-else
+              @keyup.enter="saveEdit(todo)"
+              @keyup.esc="cancelEdit(todo)"
+              :disabled="!todo.editing"
+            />
           </ul>
         </label>
 
-        <div class="todo-content">
-          <input type="text" v-model="todo.content" />
-        </div>
-
         <div class="actions">
+          <button class="edit" @click="startEdit(todo)" v-if="!todo.done">
+            Edit
+          </button>
+          <button class="cancel" @click="cancelEdit(todo)" v-if="todo.editing">
+            Batal
+          </button>
           <button class="delete" @click="removeTodo(todo)">Hapus</button>
         </div>
       </div>
@@ -73,6 +109,7 @@ function removeTodo(todo) {
       </div>
     </section>
   </main>
+  <Footer />
 </template>
 
 <style>
@@ -115,7 +152,6 @@ body {
   color: var(--dark);
   background-color: #00b4d8;
   padding-left: 30px;
-  background-image: url("bakgound.jpg");
 }
 
 section {
@@ -243,13 +279,14 @@ input[type="checkbox"] {
 .todo-item .actions {
   display: flex;
   align-items: center;
+  padding-left: 2rem;
 }
 
 .todo-item .actions button {
   display: block;
   padding: 0.5rem;
   border-radius: 0.25rem;
-  color: #fff;
+  color: white;
   cursor: pointer;
   transition: 0.2s ease-in-out;
 }
@@ -260,11 +297,15 @@ input[type="checkbox"] {
 
 .todo-item .actions .edit {
   margin-right: 0.5rem;
-  background-color: var(--primary);
+  background-color: green;
 }
 
 .todo-item .actions .delete {
   background-color: var(--danger);
+}
+
+.todo-item .actions .cancel {
+  background-color: black;
 }
 
 .todo-item.done .todo-content input {
