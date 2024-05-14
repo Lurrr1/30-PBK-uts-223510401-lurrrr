@@ -14,21 +14,21 @@ const pages = [
 
 const currentPageIndex = ref(0);
 
-const goToPreviousPage = () => {
-  if (currentPageIndex.value > 0) {
-    currentPageIndex.value--;
-    updateTitle();
-    router.push(pages[currentPageIndex.value].path);
-  }
-};
+// const goToPreviousPage = () => {
+//   if (currentPageIndex.value > 0) {
+//     currentPageIndex.value--;
+//     updateTitle();
+//     router.push(pages[currentPageIndex.value].path);
+//   }
+// };
 
-const goToNextPage = () => {
-  if (currentPageIndex.value < pages.length - 1) {
-    currentPageIndex.value++;
-    updateTitle();
-    router.push(pages[currentPageIndex.value].path);
-  }
-};
+// const goToNextPage = () => {
+//   if (currentPageIndex.value < pages.length - 1) {
+//     currentPageIndex.value++;
+//     updateTitle();
+//     router.push(pages[currentPageIndex.value].path);
+//   }
+// };
 
 const updateTitle = () => {
   pageTitle.value = pages[currentPageIndex.value].title;
