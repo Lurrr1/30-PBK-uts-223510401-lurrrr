@@ -99,7 +99,7 @@ onMounted(() => {
 .nav-link-posts,
 .nav-link-home {
   position: relative;
-  bottom: 3vh;
+  bottom: 2.9vh;
   text-decoration: none;
   color: inherit;
   cursor: pointer;
