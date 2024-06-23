@@ -1,401 +1,364 @@
-<script setup>
-import { ref, computed } from "vue";
-import Header from "../components/Header.vue";
-import Footer from "../components/Footer.vue";
-
-let id = 0;
-
-const newTodo = ref("");
-const hideCompleted = ref(false);
-const todos = ref([]);
-
-const filteredTodos = computed(() => {
-  return hideCompleted.value ? todos.value.filter((t) => !t.done) : todos.value;
-});
-
-function addTodo() {
-  todos.value.push({
-    id: id++,
-    text: newTodo.value,
-    done: false,
-    editing: false,
-  });
-  newTodo.value = "";
-}
-
-function removeTodo(todo) {
-  todos.value = todos.value.filter((t) => t !== todo);
-}
-
-function startEdit(todo) {
-  todo.editing = true; // Toggle editing mode on click
-  todo.editedText = todo.text; // Backup original text for editing
-}
-
-function saveEdit(todo) {
-  if (todo.editedText.trim()) {
-    // Only save if there's actual content
-    todo.text = todo.editedText;
-  }
-  todo.editing = false; // Exit editing mode
-}
-
-function cancelEdit(todo) {
-  todo.editing = false; // Exit editing mode without saving
-  todo.editedText = todo.text; // Restore original text
-}
-</script>
-
 <template>
-  <Header />
-  <main class="app">
-    <section class="create-todo">
-      <h3><b>Isi List tugas yang akan dilakukan!</b></h3>
-      <form id="new-todo-form" @submit.prevent="addTodo">
-        <input
-          type="text"
-          name="content"
-          id="content"
-          placeholder="Example: PBK"
-          v-model="newTodo"
-        />
-        <button class="tugas">Tambahkan tugas</button>
-      </form>
-    </section>
-
-    <section class="todo-list">
-      <h3><b>LIST TUGAS :</b></h3>
-      <div
-        v-for="todo in filteredTodos"
-        :key="todo.id"
-        :class="`todo-item ${todo.done && 'done'}`"
-      >
-        <label>
-          <ul>
-            <input
-              type="checkbox"
-              class="styled-checkbox"
-              v-model="todo.done"
-              :disabled="todo.editing"
-            />
-            <span :class="{ done: todo.done }" v-if="!todo.editing">
-              {{ todo.text }}
-            </span>
-            <input
-              type="text"
-              v-model="todo.editedText"
-              v-else
-              @keyup.enter="saveEdit(todo)"
-              @keyup.esc="cancelEdit(todo)"
-              :disabled="!todo.editing"
-            />
-          </ul>
-        </label>
-
-        <div class="actions">
-          <button class="edit" @click="startEdit(todo)" v-if="!todo.done">
-            Edit
-          </button>
-          <button class="cancel" @click="cancelEdit(todo)" v-if="todo.editing">
-            Batal
-          </button>
-          <button class="delete" @click="removeTodo(todo)">Hapus</button>
-        </div>
+  <q-page-container class="q-pa-md">
+    <!-- Home Section -->
+    <section class="home" id="home">
+      <div class="home-content">
+        <h3>Halo! Saya,</h3>
+        <h1>Fadhlur Rohman</h1>
+        <h3>Seorang Iot Developer<span class="multiple-text"></span></h3>
+        <p>
+          Seorang mahasiswa Teknik Informatika yang berambisi dan kompetitif,
+          serta selalu sedia mempelajari hal-hal baru!
+        </p>
+        <q-btn color="primary" :href="cvLink" target="_blank" class="q-mt-md">
+          Download CV
+        </q-btn>
       </div>
-      <div>
-        <button class="hide" @click="hideCompleted = !hideCompleted">
-          {{ hideCompleted ? "Tampilkan Semua" : "Sembunyikan yang Selesai" }}
-        </button>
+      <div class="home-img">
+        <img src="../assets/img/profile.png" alt="Profile Picture" />
       </div>
     </section>
-  </main>
-  <Footer />
+
+    <!-- About Section -->
+    <section class="about q-my-xl">
+      <q-card class="about-card">
+        <q-card-section>
+          <h2 class="heading">ABOUT <span>ME</span></h2>
+          <h3>Junior IoT Developer</h3>
+          <p>
+            Saya, Fadhlur Rohman, adalah seorang mahasiswa yang aktif di
+            Universitas Islam Riau, menjalani studi di Jurusan Teknik
+            Informatika. Saya sangat tertarik dalam bidang Internet of Things
+            (IoT) dan robotika. Memiliki keinginan yang mendalam terhadap
+            implementasi robot dalam industri pertambangan, saya juga memiliki
+            minat yang kuat terhadap dinamika dunia kerja. Saya yakin bahwa
+            dedikasi serta ketertarikan saya dalam bidang ini akan menjadi
+            kontribusi yang berarti dalam lingkungan professional.
+          </p>
+        </q-card-section>
+      </q-card>
+    </section>
+
+    <!-- Projects Section -->
+    <section class="projects" id="projects">
+      <h2 class="heading">Latest<span> Projects</span></h2>
+      <div class="q-pa-md row items-start q-gutter-md">
+        <q-card
+          v-for="project in projects"
+          :key="project.title"
+          class="my-card"
+          flat
+          bordered
+        >
+          <q-img :src="project.img" :alt="project.title" class="project-img" />
+          <q-card-section>
+            <div class="text-overline text-orange-9">{{ project.title }}</div>
+            <div class="text-h5 q-mt-sm q-mb-xs">{{ project.title }}</div>
+            <div class="text-caption text-grey">{{ project.description }}</div>
+          </q-card-section>
+          <q-card-actions>
+            <q-btn
+              flat
+              color="primary"
+              :label="project.title"
+              :href="project.link"
+              target="_blank"
+              icon="open_in_new"
+            />
+            <q-space />
+            <q-btn
+              color="grey"
+              round
+              flat
+              dense
+              :icon="
+                project.expanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'
+              "
+              @click="project.expanded = !project.expanded"
+            />
+          </q-card-actions>
+          <q-slide-transition>
+            <div v-show="project.expanded">
+              <q-separator />
+              <q-card-section class="text-subtitle2">
+                {{ project.longDescription }}
+              </q-card-section>
+            </div>
+          </q-slide-transition>
+        </q-card>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+      <h2 class="heading">Contact<span> Me</span></h2>
+      <div class="container">
+        <q-btn
+          v-for="contact in contacts"
+          :key="contact.name"
+          :href="contact.link"
+          target="_blank"
+          class="icon-box q-ma-sm"
+          no-caps
+        >
+          <q-icon :name="contact.icon" size="30px" />
+          <span class="text">{{ contact.text }}</span>
+        </q-btn>
+      </div>
+      <h1 class="text-center email">
+        You can contact me with:
+        <a href="mailto:fadlurrohman1204@gmail.com"
+          >fadlurrohman1204@gmail.com</a
+        >
+      </h1>
+    </section>
+  </q-page-container>
 </template>
 
-<style>
-.done {
-  text-decoration: line-through;
-}
-:root {
-  --primary: #ea40a4;
-  --business: #3a82ee;
-  --personal: var(--primary);
-  --light: #eee;
-  --grey: #888;
-  --dark: #313154;
-  --danger: #ff5b57;
+<script setup>
+import AGRO from "../assets/img/AGRO.png";
+import IOT from "../assets/img/IOT.png";
+import ROBOT from "../assets/img/ROBOTIC.png";
+import cvLink from "../assets/Fadhlur_RohmanCV2.pdf";
+const projects = [
+  {
+    title: "AgroSmart",
+    img: AGRO,
+    description:
+      "Memudahkan perkebunan dalam melaksanakan kegiatan perkebunan...",
+    longDescription:
+      "AgroSmart is a comprehensive solution for managing agricultural activities, making it easier for plantations to carry out their operations efficiently and effectively...",
+    link: "https://github.com/wagi1922/AgroSmart",
+    expanded: false,
+  },
+  {
+    title: "Fingerprint IoT",
+    img: IOT,
+    description:
+      "Ini adalah project IoT yang mana project ini berfungsi sebagai alat keamanan...",
+    longDescription:
+      "The Fingerprint IoT project serves as a security tool that utilizes biometric authentication to ensure the safety and security of the environment...",
+    link: "https://www.instagram.com/s/aGlnaGxpZ2h0OjE3OTc1MTcyMDM1MjA5MTA1?story_media_id=3187039436734799853_7934330832&igsh=ODc1ZDFneTc3NXpu",
+    expanded: false,
+  },
+  {
+    title: "Robot Control",
+    img: ROBOT,
+    description:
+      "Ini adalah salah satu project Robotic saya yang mana ini adalah...",
+    longDescription:
+      "The Robot Control project showcases the implementation of robotic systems for various applications, demonstrating advanced control techniques and automation...",
+    link: "https://www.instagram.com/s/aGlnaGxpZ2h0OjE3OTc1MTcyMDM1MjA5MTA1?story_media_id=3094449353562225891_7934330832&igsh=ODc1ZDFneTc3NXpu",
+    expanded: false,
+  },
+];
+const contacts = [
+  {
+    name: "instagram",
+    link: "https://www.instagram.com/lurrr.1",
+    icon: "fab fa-instagram",
+    text: "lurrr.1",
+  },
+  {
+    name: "linkedin",
+    link: "https://www.linkedin.com/in/fadhlur-rohman-d1012/",
+    icon: "fab fa-linkedin",
+    text: "Fadhlur Rohman",
+  },
+  {
+    name: "github",
+    link: "https://github.com/Lurrr1",
+    icon: "fab fa-github",
+    text: "Lurrr1",
+  },
+];
+</script>
 
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-
-  --business-glow: 0px 0px 4px rgba(58, 130, 238, 0.75);
-  --personal-glow: 0px 0px 4px rgba(234, 64, 164, 0.75);
-}
-
-* {
-  margin: 0;
+<style scoped>
+.home {
   padding: 0;
-  box-sizing: border-box;
-  font-family: "montserrat", sans-serif;
-}
-
-input:not([type="radio"]):not([type="checkbox"]),
-button {
-  appearance: none;
-  border: none;
-  outline: none;
-  background: none;
-  cursor: initial;
-}
-
-body {
-  background: var(--light);
-  color: var(--dark);
-  background-color: #00b4d8;
-  padding-left: 30px;
-}
-
-section {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-  padding-left: 1.5rem;
-  padding-right: 1.5em;
-}
-
-h3 {
-  color: var(black);
-  font-size: 1rem;
-  font-weight: 400;
-  margin-bottom: 0.5rem;
-}
-
-h4 {
-  color: var(--grey);
-  font-size: 0.875rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  text-align: center;
-}
-
-.tittle {
-  animation: fadeIn 1s ease;
-  text-shadow: 2px 2px 4px #000000;
-  font-family: "Montserrat", sans-serif;
-}
-.greeting .title {
   display: flex;
-  animation: fadeIn 1s ease;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+  color: white;
 }
 
-.greeting .title input {
-  margin-left: 0.5rem;
-  flex: 1 1 0%;
-  min-width: 0;
+.home-content {
+  max-width: 500px;
+  text-align: left;
+  padding: 20px;
 }
 
-.greeting .title,
-.greeting .title input {
-  color: var(black);
-  font-size: 2rem;
+.home-content h3 {
+  font-size: 2.5rem;
   font-weight: 700;
-  text-align: center;
 }
 
-.create-todo input[type="text"] {
-  display: block;
+.home-content h1 {
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.home-content p {
+  font-size: 1.4rem;
+  margin-top: 1rem;
+}
+
+.home-img img {
   width: 100%;
-  font-size: 1.125rem;
-  padding: 1rem 1.5rem;
-  color: var(--dark);
-  background-color: #deb887;
-  border-radius: 0.5rem;
-  box-shadow: var(--shadow);
-  margin-bottom: 1.5rem;
+  max-width: 400px;
+  box-sizing: border-box;
+  border-radius: 50%;
 }
 
-.create-todo .options {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-gap: 1rem;
-  margin-bottom: 1.5rem;
+@media (max-width: 768px) {
+  .home-content h3 {
+    font-size: 2rem;
+  }
+
+  .home-content h1 {
+    font-size: 3rem;
+  }
+
+  .home-content p {
+    font-size: 1.2rem;
+  }
+
+  .home-img img {
+    max-width: 300px;
+  }
 }
 
-.create-todo .options label {
+.about {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  background: var(--snd-bf-color);
+  padding: 2rem;
+}
+
+.about-card {
+  max-width: 900px;
+  width: 100%;
+}
+
+.about-content h2 {
+  text-align: left;
+  line-height: 1.2;
+}
+
+.about-content h3 {
+  font-size: 2.6rem;
+}
+
+.about-content p {
+  font-size: 1.6rem;
+  margin: 2rem 0 3rem;
+}
+
+.projects {
+  background: var(--bg-color);
+}
+
+.projects h2 {
+  margin-bottom: 4rem;
+  text-align: center;
+  color: white;
+}
+
+.my-card {
+  transition: transform 0.3s;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.my-card:hover {
+  transform: scale(1.05);
+}
+
+.project-img {
+  height: 200px;
+  object-fit: cover;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.icon-box {
+  margin: 0 10px;
+  border-radius: 25px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
-  background-color: #deb887;
-  border-radius: 0.5rem;
-  box-shadow: var(--shadow);
-  cursor: pointer;
-}
-
-input[type="radio"],
-input[type="checkbox"] {
-  display: none;
-}
-
-.create-todo input[type="submit"] {
-  display: block;
-  width: 100%;
-  font-size: 1.125rem;
-  padding: 1rem 1.5rem;
-  color: #fff;
-  background-color: var(--primary);
-  border-radius: 0.5rem;
-  box-shadow: var(--personal-glow);
-  cursor: pointer;
-  transition: 0.2s ease-in-out;
-}
-
-.create-todo input[type="submit"]:hover {
-  opacity: 0.75;
-}
-
-.todo-list .list {
-  margin: 1rem 0;
-}
-
-.todo-list .todo-item {
-  display: flex;
-  align-items: center;
-  background-color: #deb887;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  box-shadow: var(--shadow);
-  margin-bottom: 1rem;
-}
-
-.todo-item .todo-content {
-  flex: 1 1 0%;
-}
-
-.todo-item .todo-content input {
-  color: var(--dark);
-  font-size: 1.125rem;
-}
-
-.todo-item .actions {
-  display: flex;
-  align-items: center;
-  padding-left: 2rem;
-}
-
-.todo-item .actions button {
-  display: block;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  color: white;
-  cursor: pointer;
-  transition: 0.2s ease-in-out;
-}
-
-.todo-item .actions button:hover {
-  opacity: 0.75;
-}
-
-.todo-item .actions .edit {
-  margin-right: 0.5rem;
-  background-color: green;
-}
-
-.todo-item .actions .delete {
-  background-color: var(--danger);
-}
-
-.todo-item .actions .cancel {
+  width: 200px;
+  padding: 10px;
   background-color: black;
-}
-
-.todo-item.done .todo-content input {
-  text-decoration: line-through;
-  color: var(--grey);
-}
-
-button {
-  background-color: #f2f2f2;
-  border: none;
-  color: #555;
-  padding: 10px 20px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  border-radius: 4px;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.hide {
-  background-color: grey;
-  border: none;
   color: white;
-  padding: 10px 20px;
-  text-align: center;
   text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  border-radius: 4px;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
-}
-.hide:hover {
-  box-shadow: 0 8px 16px 0 rgba(16, 75, 16, 0.2); /*Efek shadow yang lebih kuat saat dihover*/
+  transition: background-color 0.3s;
 }
 
-.tugas {
-  background-color: grey;
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  border-radius: 4px;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
-}
-.tugas:hover {
-  box-shadow: 0 8px 16px 0 rgba(16, 75, 16, 0.2); /*Efek shadow yang lebih kuat saat dihover*/
+.icon-box:hover {
+  background-color: darkgrey;
 }
 
-input[type="checkbox"].styled-checkbox {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 1px solid #ccc;
-  background-color: #fff;
-  vertical-align: middle;
-  position: relative;
-  top: 3px;
+.icon-box i {
+  font-size: 30px;
   margin-right: 10px;
-  cursor: pointer;
 }
 
-/* CSS untuk gambar centang */
-input[type="checkbox"].styled-checkbox:checked:before {
-  content: "\2713";
-  font-size: 14px;
-  color: #fff;
-  background-color: black;
+.icon-box .text {
+  font-size: 1rem;
+}
+.contact h2 {
   text-align: center;
-  line-height: 14px;
-  position: absolute;
-  top: -1px;
-  left: -1px;
-  width: 16px;
-  height: 16px;
-  border: 1px solid grey;
-  border-radius: 3px;
+  color: white;
+}
+.contact h1 {
+  color: var(--main-color);
+  text-align: center;
 }
 
-/* CSS untuk menampilkan border saat checkbox di-hover */
-input[type="checkbox"].styled-checkbox:hover {
-  border-color: #007bff;
+.contact h1.email {
+  font-size: 1.2rem;
+  margin-top: 1rem;
+  color: white;
+}
+
+.contact h1.email a {
+  color: white;
+  text-decoration: none;
+}
+
+.contact h1.email a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .contact .icon-box {
+    width: 180px;
+    padding: 8px;
+  }
+
+  .contact .icon-box i {
+    font-size: 24px;
+  }
+
+  .contact .icon-box .text {
+    font-size: 0.9rem;
+  }
+
+  .contact h1.email {
+    font-size: 1rem;
+  }
 }
 </style>
